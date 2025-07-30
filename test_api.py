@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import requests
+import httpx
 import sys
 
 BASE_URL = "http://localhost:8000"
@@ -7,7 +7,7 @@ BASE_URL = "http://localhost:8000"
 
 def test_root():
     print("Testing root endpoint...")
-    response = requests.get(f"{BASE_URL}/")
+    response = httpx.get(f"{BASE_URL}/")
     assert response.status_code == 200
     data = response.json()
     print(f"✓ Root endpoint: {data}")
@@ -18,7 +18,7 @@ def test_fibonacci_endpoint():
     print("\nTesting Fibonacci endpoint...")
 
     # Test basic calculation
-    response = requests.get(f"{BASE_URL}/fibonacci/10")
+    response = httpx.get(f"{BASE_URL}/fibonacci/10")
     assert response.status_code == 200
     data = response.json()
     assert data["result"] == 55
@@ -27,7 +27,7 @@ def test_fibonacci_endpoint():
     # Test different algorithms
     algorithms = ["iterative", "recursive", "recursive_memo"]
     for algo in algorithms:
-        response = requests.get(f"{BASE_URL}/fibonacci/20?algorithm={algo}")
+        response = httpx.get(f"{BASE_URL}/fibonacci/20?algorithm={algo}")
         assert response.status_code == 200
         data = response.json()
         assert data["result"] == 6765
@@ -36,11 +36,11 @@ def test_fibonacci_endpoint():
         )
 
     # Test error handling
-    response = requests.get(f"{BASE_URL}/fibonacci/-1")
+    response = httpx.get(f"{BASE_URL}/fibonacci/-1")
     assert response.status_code == 400
     print("✓ Negative input validation works")
 
-    response = requests.get(f"{BASE_URL}/fibonacci/50?algorithm=recursive")
+    response = httpx.get(f"{BASE_URL}/fibonacci/50?algorithm=recursive")
     assert response.status_code == 400
     print("✓ Recursive limit validation works")
 
@@ -52,14 +52,14 @@ def test_cpp_implementation(cpp_available):
 
     print("\nTesting C++ implementation...")
 
-    response = requests.get(f"{BASE_URL}/fibonacci/50?implementation=cpp")
+    response = httpx.get(f"{BASE_URL}/fibonacci/50?implementation=cpp")
     assert response.status_code == 200
     data = response.json()
     assert data["implementation"] == "cpp"
     print(f"✓ C++ implementation: Fibonacci(50) = {data['result']}")
 
     # Compare with Python
-    response_py = requests.get(f"{BASE_URL}/fibonacci/50?implementation=python")
+    response_py = httpx.get(f"{BASE_URL}/fibonacci/50?implementation=python")
     assert response_py.json()["result"] == data["result"]
     print("✓ C++ and Python results match")
 
@@ -67,7 +67,7 @@ def test_cpp_implementation(cpp_available):
 def test_benchmark():
     print("\nTesting benchmark endpoint...")
 
-    response = requests.get(f"{BASE_URL}/benchmark/30")
+    response = httpx.get(f"{BASE_URL}/benchmark/30")
     assert response.status_code == 200
     data = response.json()
 
@@ -110,7 +110,7 @@ def main():
 
         print("\n✅ All tests passed!")
 
-    except requests.exceptions.ConnectionError:
+    except httpx.ConnectError:
         print(
             "❌ Error: Cannot connect to server. Make sure the server is running on http://localhost:8000"
         )
