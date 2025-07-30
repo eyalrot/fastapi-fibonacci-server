@@ -1,0 +1,94 @@
+{
+    "name": "Python FastAPI Development",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "..",
+        "cacheFrom": ["type=local,src=/tmp/.buildx-cache"],
+        "args": {
+            "BUILDKIT_INLINE_CACHE": "1"
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "enableNonRootDocker": "true",
+            "moby": "true"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-python.flake8",
+                "ms-python.mypy-type-checker",
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake",
+                "ms-azuretools.vscode-docker",
+                "esbenp.prettier-vscode",
+                "streetsidesoftware.code-spell-checker",
+                "donjayamanne.githistory",
+                "eamodio.gitlens"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.formatting.provider": "black",
+                "python.formatting.blackPath": "/usr/local/bin/black",
+                "python.linting.flake8Enabled": true,
+                "python.linting.flake8Path": "/usr/local/bin/flake8",
+                "python.linting.mypyEnabled": true,
+                "python.linting.mypyPath": "/usr/local/bin/mypy",
+                "python.testing.pytestEnabled": true,
+                "python.testing.unittestEnabled": false,
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": true
+                },
+                "files.trimTrailingWhitespace": true,
+                "files.insertFinalNewline": true,
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/local/bin/bash-wrapper",
+                        "args": []
+                    }
+                }
+            }
+        }
+    },
+    "forwardPorts": [11433],
+    "postCreateCommand": "pip install -e . 2>/dev/null || true && pre-commit install 2>/dev/null || true",
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+        "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.config/Code/User,target=/home/vscode/.config/Code/User,type=bind,consistency=cached"
+    ],
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--cap-add=NET_RAW",
+        "--cap-add=NET_ADMIN",
+        "--security-opt",
+        "seccomp=unconfined"
+    ],
+    "containerEnv": {
+        "PYTHONPATH": "/workspace",
+        "TERM": "xterm-256color",
+        "COLORTERM": "truecolor",
+        "LANG": "en_US.UTF-8",
+        "LC_ALL": "en_US.UTF-8",
+        "INPUTRC": "/home/vscode/.inputrc",
+        "VSCODE_IPC_HOOK_CLI": "${localEnv:VSCODE_IPC_HOOK_CLI}",
+        "CLAUDE_CODE_IN_DEVCONTAINER": "true"
+    },
+    "postStartCommand": "bash -c 'source ~/.bashrc && stty sane && ln -sfn ~/.claude /workspace/.claude && echo Terminal configured successfully'",
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+}
